@@ -2,7 +2,6 @@ package kcsv
 
 class Row(
     val rowNum: Int,
-    //private val columns: List<Column>,
     private val table: Table
 ) {
     val data: List<String> by lazy {
@@ -13,6 +12,10 @@ class Row(
     operator fun get(columnName: String): String {
         val idx = table.columnNameToIdx[columnName] ?: throw Exception("No such column: $columnName")
         return data[idx]
+    }
+
+    fun toCsv():String{
+       return data.joinToString(",")
     }
 }
 

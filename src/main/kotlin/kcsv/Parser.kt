@@ -20,7 +20,6 @@ class Parser(
                 .map { readTable(tableName(it), it.readLines(), config.select) }
                 .reduce(Table::plus)
 
-
         doPrint(resultTable, Duration.between(start, Instant.now()))
         return resultTable
     }
@@ -36,7 +35,7 @@ class Parser(
     private fun readTable(tableName: String, textLines: List<String>, select: List<String>): Table {
 
 
-        val headerColumnNames = split(textLines.first()).map { trim(it) }
+        val headerColumnNames = textLines.first().split(REGEX).map { trim(it) }
 
         val columnNamesToSelect = if (select.isEmpty() || Kcsv.`*` in select) {
             val beforeAsterisk = select.dropLastWhile { it != Kcsv.`*` }.dropLast(1)
@@ -54,7 +53,7 @@ class Parser(
 
         val columns = columnNamesToSelect
                 .map {
-                    if (it == Kcsv.ROWNUM) {
+                    if (it == Kcsv.ROW_NUM) {
                         ColumnMutable(name = it, fromIdx = -1)
                     } else if (it == Kcsv.TABLE_NAME) {
                         ColumnMutable(name = it, fromIdx = -1)
@@ -66,7 +65,7 @@ class Parser(
 
         data.forEachIndexed { idx, it ->
 
-            val row = split(it)
+            val row = it.split(REGEX)
             val currentRowNum = idx + 1
 
             if (config.lineNumbers.isNotEmpty() && currentRowNum !in config.lineNumbers) {
@@ -79,7 +78,7 @@ class Parser(
             }
 
             for (column in columns) {
-                if (column.name == Kcsv.ROWNUM) {
+                if (column.name == Kcsv.ROW_NUM) {
                     column.data += currentRowNum.toString()
                 } else if (column.name == Kcsv.TABLE_NAME) {
                     column.data += tableName
@@ -92,12 +91,6 @@ class Parser(
         return table
     }
 
-    private fun split(line: String): List<String> {
-        return when (config.split) {
-            Split.SIMPLE -> line.split(",")
-            Split.QUOTED -> line.split(REGEX)
-        }
-    }
 
     private fun trim(value: String): String {
         return if (config.trim) {
@@ -108,14 +101,6 @@ class Parser(
     }
 
     private fun doPrint(table: Table, duration: Duration) {
-        if (config.printHeader) {
-            println(table.columnNameToIdx.keys.joinToString())
-        }
-        if (config.printData) {
-            table.rows.forEach(::println)
-        }
-        if (config.timed) {
             println("Took: ${duration.toMillis()} ms")
-        }
     }
 }

@@ -4,21 +4,30 @@ import java.io.File
 import java.util.logging.Level
 
 fun main(args: Array<String>) {
-    fun  Any.print() {
-        println(this)
+
+    val table = Kcsv {
+        select( Kcsv.ROW_NUM, Kcsv.TABLE_NAME, "FIRST NAME")
+        addPath("/Users/maxfarsikov/Downloads/kemp.csv")
+        tableNameStrategy(TableNameStrategy.FILE_NAME)
+        trim()
+        //logger(Level.OFF)
     }
 
-    val lines = Kcsv {
-        select("PROFILE ID","TITLE")
-        path("/Users/maxfarsikov/Desktop/kemp-bookings.2018-11-01")
-        tableName(TableNameStrategy.FILE_NAME)
+
+
+    File("/Users/maxfarsikov/Downloads/kemp2.csv").writeText(table.toCsv())
+
+     Kcsv {
+        addPath("/Users/maxfarsikov/Downloads/kemp2.csv")
+        tableNameStrategy(TableNameStrategy.FILE_NAME)
         trim()
-        logger(Level.OFF)
-        timed()
-    }.rows
-        .map { (profileId, title) -> "('$profileId', '$title'),"}
-        .distinct()
-        .joinToString(separator = "\n")
+        //logger(Level.OFF)
+    }.print()
+
+/*    val lines = table.rows
+            .map { (profileId, title) -> "('$profileId', '$title')," }
+            .distinct()
+            .joinToString(separator = "\n")
 
 
 
@@ -29,6 +38,6 @@ create table title (
 );
 insert into title values
 $lines
-    """.trimIndent())
+    """.trimIndent())*/
 
 }

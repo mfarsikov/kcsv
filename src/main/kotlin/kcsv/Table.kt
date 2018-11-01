@@ -1,7 +1,7 @@
 package kcsv
 
 data class Table(
-    val columns: List<Column>
+        val columns: List<Column>
 ) {
     val rowsCount = columns.first().data.size
     val columnNameToIdx: Map<String, Int> = columns.mapIndexed { index, column -> column.name to index }.toMap()
@@ -31,6 +31,27 @@ data class Table(
         }
 
         return Table(this.columns.mapIndexed { index, column -> column + other.columns[index] })
+    }
+
+    override fun toString(): String {
+
+        val header = columns.map { it.name.padEnd(it.width) }.joinToString(" ")
+
+        val body = (0 until rowsCount).asSequence()
+                .map { i -> columns.map { it.data[i].padEnd(it.width) }.joinToString(" ") }
+                .joinToString("\n")
+
+        return StringBuilder(header).append("\n").append(body).toString()
+    }
+
+    fun print() {
+        println(this)
+    }
+
+    fun toCsv(): String {
+        val header = columns.map { it.name }.joinToString(",")
+        val body = rows.map { it.toCsv() }.joinToString("\n")
+        return StringBuilder(header).append("\n").append(body).toString()
     }
 }
 
