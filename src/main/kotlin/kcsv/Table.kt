@@ -6,10 +6,14 @@ data class Table(
     val rowsCount = columns.first().data.size
     val columnNameToIdx: Map<String, Int> = columns.mapIndexed { index, column -> column.name to index }.toMap()
 
-    val rows: Rows
+    val rows: Iterable<Row>
         get() {
             return Rows(this)
         }
+
+    val header: List<String> by lazy {
+        columns.map { it.name }
+    }
 
     operator fun get(columnName: String): Column {
         return columns.first { it.name == columnName }
@@ -35,10 +39,10 @@ data class Table(
 
     override fun toString(): String {
 
-        val header = columns.map { it.name.padEnd(it.width) }.joinToString(" ")
+        val header = columns.map { it.name.padEnd(it.maxWidth) }.joinToString(" ")
 
         val body = (0 until rowsCount).asSequence()
-                .map { i -> columns.map { it.data[i].padEnd(it.width) }.joinToString(" ") }
+                .map { i -> columns.map { it.data[i].padEnd(it.maxWidth) }.joinToString(" ") }
                 .joinToString("\n")
 
         return StringBuilder(header).append("\n").append(body).toString()

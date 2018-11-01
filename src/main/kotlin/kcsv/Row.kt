@@ -9,6 +9,11 @@ class Row(
     }
 
     override fun toString() = data.joinToString()
+
+    operator fun get(columnIndex: Int): String{
+        return data[columnIndex]
+    }
+
     operator fun get(columnName: String): String {
         val idx = table.columnNameToIdx[columnName] ?: throw Exception("No such column: $columnName")
         return data[idx]

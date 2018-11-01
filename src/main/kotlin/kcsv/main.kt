@@ -13,8 +13,6 @@ fun main(args: Array<String>) {
         //logger(Level.OFF)
     }
 
-
-
     File("/Users/maxfarsikov/Downloads/kemp2.csv").writeText(table.toCsv())
 
      Kcsv {
