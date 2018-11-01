@@ -1,11 +1,34 @@
 package kcsv
 
+import java.io.File
+import java.util.logging.Level
+
 fun main(args: Array<String>) {
-    CSV {
-        select(CSV.ROWNUM, "CONFIRMATION NUMBER")
-        path("/Users/maxfarsikov/Downloads/Berlin and Venice YTD 24 June1.csv")
-/*        skip(5)
-        limit(10)*/
-        print()
+    fun  Any.print() {
+        println(this)
     }
+
+    val lines = Kcsv {
+        select("PROFILE ID","TITLE")
+        path("/Users/maxfarsikov/Desktop/kemp-bookings.2018-11-01")
+        tableName(TableNameStrategy.FILE_NAME)
+        trim()
+        logger(Level.OFF)
+        timed()
+    }.rows
+        .map { (profileId, title) -> "('$profileId', '$title'),"}
+        .distinct()
+        .joinToString(separator = "\n")
+
+
+
+    File("/Users/maxfarsikov/Desktop/kemp-bookings.2018-11-01/res.txt").writeText("""
+create table title (
+                       profileId varchar(255),
+                       title varchar(255)
+);
+insert into title values
+$lines
+    """.trimIndent())
+
 }

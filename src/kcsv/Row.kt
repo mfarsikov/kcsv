@@ -2,13 +2,18 @@ package kcsv
 
 class Row(
     val rowNum: Int,
-    private val columns: List<Column>
+    //private val columns: List<Column>,
+    private val table: Table
 ) {
     val data: List<String> by lazy {
-        columns.map { it.data[rowNum] }
+        table.columns.map { it.data[rowNum] }
     }
 
     override fun toString() = data.joinToString()
+    operator fun get(columnName: String): String {
+        val idx = table.columnNameToIdx[columnName] ?: throw Exception("No such column: $columnName")
+        return data[idx]
+    }
 }
 
 operator fun Row.component1() = data[0]
