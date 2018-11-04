@@ -1,0 +1,4 @@
+ORDER_ID,FIRST_NAME,LAST_NAME,PRODUCT_NAME,PRICE,COMMENT, SPACED_COLUMN
+132435,Lisa,Brown,Brush,25.57,"One of these colors: pink, red, purple", some data
+543432,Donald,Ramington,Steering wheel,185.00,"", bla-bla
+432134,Roger,Watson,Tube,43.50,"Best before 11:00 AM tomorrow",  foo-bar

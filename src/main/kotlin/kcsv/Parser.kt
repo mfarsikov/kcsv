@@ -11,16 +11,20 @@ class Parser(
         private val REGEX = """,(?=([^"]*"[^"]*")*(?![^"]*"))""".toRegex()
     }
 
-    fun parse(): Table {
+    fun parse(): Columns {
+
+        if(config.paths.isEmpty()) throw Exception("At least one CSV file path should be provided")
 
         val start = Instant.now()
+
         val resultTable = config.paths.asSequence()
                 .flatMap { File(it).walk() }
                 .filter { it.isFile && it.extension.toLowerCase() == "csv" }
                 .map { readTable(tableName(it), it.readLines(), config.select) }
-                .reduce(Table::plus)
+                .reduce(Columns::plus)
 
-        doPrint(resultTable, Duration.between(start, Instant.now()))
+        println("Took: ${Duration.between(start, Instant.now()).toMillis()} ms")
+
         return resultTable
     }
 
@@ -32,12 +36,12 @@ class Parser(
         }
     }
 
-    private fun readTable(tableName: String, textLines: List<String>, select: List<String>): Table {
+    private fun readTable(tableName: String, textLines: List<String>, select: List<String>): Columns {
 
 
         val headerColumnNames = textLines.first().split(REGEX).map { trim(it) }
 
-        val columnNamesToSelect = if (select.isEmpty() || Kcsv.`*` in select) {
+        val columnNamesForSelect = if (select.isEmpty() || Kcsv.`*` in select) {
             val beforeAsterisk = select.dropLastWhile { it != Kcsv.`*` }.dropLast(1)
             val afterAsterisk = select.dropWhile { it != Kcsv.`*` }.drop(1)
             beforeAsterisk + headerColumnNames + afterAsterisk
@@ -51,7 +55,7 @@ class Parser(
 
         val data = textLines.drop(1)
 
-        val columns = columnNamesToSelect
+        val columns = columnNamesForSelect
                 .map {
                     if (it == Kcsv.ROW_NUM) {
                         ColumnMutable(name = it, fromIdx = -1)
@@ -87,7 +91,7 @@ class Parser(
                 }
             }
         }
-        val table = Table(columns)
+        val table = Columns(columns)
         return table
     }
 
@@ -100,7 +104,4 @@ class Parser(
         }
     }
 
-    private fun doPrint(table: Table, duration: Duration) {
-            println("Took: ${duration.toMillis()} ms")
-    }
 }

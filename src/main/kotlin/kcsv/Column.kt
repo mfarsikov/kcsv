@@ -8,10 +8,16 @@ interface Column {
     val maxWidth: Int
 
     operator fun plus(other: Column): Column {
-        if (this.name != other.name) {
-            throw Exception("different column names: ${this.name} and ${other.name}")
-        }
+        if (this.name != other.name) throw Exception("different column names: ${this.name} and ${other.name}")
+
         return ColumnImmutable(name, this.data + other.data)
+    }
+
+    fun toPrettyString(): String {
+        val header = name.padEnd(maxWidth)
+        val body = data.map { it.padEnd(maxWidth) }.joinToString("\n")
+
+        return StringBuilder(header).append("\n").append(body).toString()
     }
 }
 
@@ -23,6 +29,9 @@ data class ColumnImmutable(
         val maxDataLen = data.maxBy { it.length }?.length ?: 0
         max(maxDataLen, name.length)
     }
+
+    override fun toString() = toPrettyString()
+
 }
 
 data class ColumnMutable(
@@ -34,4 +43,6 @@ data class ColumnMutable(
         val maxDataLen = data.maxBy { it.length }?.length ?: 0
         max(maxDataLen, name.length)
     }
+
+    override fun toString() = toPrettyString()
 }

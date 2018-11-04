@@ -4,7 +4,7 @@ package kcsv
 class Kcsv {
 
     companion object {
-        operator fun invoke(config: IConfig.() -> Unit): Table {
+        operator fun invoke(config: IConfig.() -> Unit): Columns {
             val cfg = Config()
             cfg.config()
             return Parser(cfg).parse()
